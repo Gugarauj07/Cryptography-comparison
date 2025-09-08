@@ -37,8 +37,6 @@ class BenchmarkSuite:
         }
 
         for size in data_sizes:
-            print(f"Testando {algorithm.__class__.__name__} com {size} bytes...")
-
             size_results = {
                 'data_size': size,
                 'encryption_times': [],
@@ -109,7 +107,6 @@ class BenchmarkSuite:
         ]
 
         for config in aes_configs:
-            print(f"\n=== Executando benchmark {config['name']} ===")
             aes = AES(key_size=config['key_size'])
             aes.generate_key()
 
@@ -127,7 +124,6 @@ class BenchmarkSuite:
         ]
 
         for config in blowfish_configs:
-            print(f"\n=== Executando benchmark {config['name']} ===")
             blowfish = Blowfish(key_size=config['key_size'])
             blowfish.generate_key()
 
@@ -181,41 +177,3 @@ class BenchmarkSuite:
         return os.urandom(size)
 
 
-def print_benchmark_summary(results):
-    """
-    Imprime um resumo dos resultados do benchmark
-
-    Args:
-        results (dict): Resultados do benchmark
-    """
-    print("\n" + "="*80)
-    print("RESUMO DO BENCHMARK DE CRIPTOGRAFIA")
-    print("="*80)
-
-    print(f"Data/hora: {time.ctime(results['timestamp'])}")
-    print(f"Tamanhos de dados testados: {[f'{s/1024:.0f}KB' if s < 1048576 else f'{s/1048576:.1f}MB' for s in results['data_sizes']]}")
-    print(f"Iterações por teste: {results['iterations']}")
-    print()
-
-    for algorithm in results['algorithms']:
-        print(f"Algoritmo: {algorithm['name']}")
-        print("-" * 40)
-
-        for result in algorithm['results']:
-            size_kb = result['data_size'] / 1024
-            size_mb = result['data_size'] / (1024 * 1024)
-
-            if size_kb < 1024:
-                size_str = f"{size_kb:.0f}KB"
-            else:
-                size_str = f"{size_mb:.1f}MB"
-
-            print(f"Tamanho: {size_str}")
-            print(".4f")
-            print(".4f")
-            print(".1f")
-            print(".1f")
-            print()
-
-        print("-" * 40)
-        print()

@@ -1,180 +1,190 @@
-# Estudo de Desempenho Computacional: AES vs Blowfish
+# Benchmark Framework: AES vs Blowfish Performance Analysis
 
-Este projeto implementa um estudo comparativo de desempenho entre os algoritmos de criptografia AES (Advanced Encryption Standard) e Blowfish, medindo uso de CPU e consumo de memória.
+Framework de análise comparativa de desempenho entre algoritmos de criptografia simétrica, implementando medições precisas de tempo de execução, uso de CPU e consumo de memória.
 
-## Estrutura do Projeto
-
-```
-crypto/
-├── algorithms/
-│   ├── __init__.py
-│   ├── aes.py          # Implementação AES
-│   └── blowfish.py     # Implementação Blowfish
-├── performance/
-│   ├── __init__.py
-│   ├── monitor.py      # Monitor de desempenho
-│   └── benchmark.py    # Sistema de benchmark
-├── main.py             # Script principal
-├── requirements.txt    # Dependências
-└── README.md          # Esta documentação
-```
-
-## Instalação
-
-1. Instale as dependências:
-```bash
-pip install -r requirements.txt
-```
-
-## Uso Básico
-
-### Demonstração dos Algoritmos
-
-Execute sem argumentos para ver uma demonstração básica:
-
-```bash
-python main.py
-```
-
-### Benchmark Completo
-
-Execute benchmark completo com configurações padrão:
-
-```bash
-python main.py
-```
-
-### Benchmark Personalizado
-
-```bash
-# Teste com tamanhos específicos de dados
-python main.py --data-sizes 1024 5120 10240
-
-# Teste rápido com menos dados
-python main.py --quick-test
-
-# Salvar resultados em arquivo JSON
-python main.py --output resultados.json
-
-# Configurar número de iterações
-python main.py --iterations 10
-```
-
-## Algoritmos Implementados
+## Funcionamento dos Algoritmos
 
 ### AES (Advanced Encryption Standard)
-- **Tamanhos de chave suportados**: 128, 192, 256 bits
-- **Modo**: CBC (Cipher Block Chaining)
-- **Padding**: PKCS7
-- **Tamanho do bloco**: 16 bytes
+
+**Princípio de Funcionamento:**
+- Algoritmo de substituição-permutação iterativa
+- Opera em blocos de 128 bits (16 bytes)
+- Utiliza chaves de 128, 192 ou 256 bits
+- Consiste em múltiplas rodadas de transformação
+
+**Processo de Criptografia:**
+1. **Expansão da Chave**: A chave mestre é expandida em um conjunto de subchaves
+2. **Adição da Chave Inicial**: XOR entre bloco de dados e primeira subchave
+3. **Rodadas**: 10, 12 ou 14 rodadas (dependendo do tamanho da chave)
+4. **Transformações por Rodada**:
+   - SubBytes: Substituição não-linear usando S-Box
+   - ShiftRows: Rotação cíclica das linhas da matriz
+   - MixColumns: Mistura das colunas através de operações no campo finito
+   - AddRoundKey: XOR com subchave da rodada
+
+**Vantagens:**
+- Altamente seguro e aprovado pelo NIST
+- Boa performance em hardware dedicado
+- Paralelização eficiente possível
 
 ### Blowfish
-- **Tamanhos de chave suportados**: 32-448 bits (múltiplos de 8)
-- **Modo**: CBC (Cipher Block Chaining)
-- **Padding**: PKCS7
-- **Tamanho do bloco**: 8 bytes
 
-## Métricas de Desempenho
+**Princípio de Funcionamento:**
+- Algoritmo Feistel de 16 rodadas
+- Opera em blocos de 64 bits (8 bytes)
+- Chaves variáveis de 32 a 448 bits
+- Usa duas operações básicas: adição e XOR
 
-O estudo mede:
+**Processo de Criptografia:**
+1. **Inicialização**: Arrays P e S são preenchidos com constantes
+2. **Expansão da Chave**: P-array é modificado usando a chave
+3. **Criptografia**: 16 rodadas Feistel
+4. **Rodada Feistel**:
+   - Divisão do bloco em esquerda (L) e direita (R)
+   - F-function: Mistura usando S-boxes e operações aritméticas
+   - L = L XOR resultado da F-function
+   - Troca L ↔ R
 
-1. **Tempo de execução**:
-   - Tempo de criptografia
-   - Tempo de descriptografia
+**Características:**
+- Algoritmo simétrico rápido
+- Baixo consumo de memória
+- Boa performance em software
 
-2. **Uso de CPU**:
-   - Média, máximo, mínimo e desvio padrão
+## Implementação Técnica
 
-3. **Consumo de memória**:
-   - Média, máximo, mínimo e desvio padrão
+### Arquitetura do Sistema
 
-## Exemplo de Saída
+#### Camada de Algoritmos (`algorithms/`)
+- **`aes.py`**: Classe AES com métodos encrypt/decrypt
+- **`blowfish.py`**: Classe Blowfish com métodos encrypt/decrypt
+- **Interface unificada**: Mesma API para ambos os algoritmos
+- **Tratamento de erros**: Validação de parâmetros e estados
 
-```
-Estudo de Desempenho Computacional
-Comparação: AES vs Blowfish
-==================================================
-Tamanhos de dados: ['1KB', '10KB', '100KB', '1MB']
-Iterações por teste: 5
+#### Camada de Monitoramento (`performance/`)
+- **`monitor.py`**: Coleta métricas de sistema em tempo real
+- **`PerformanceMonitor`**: Threading para monitoramento não-bloqueante
+- **`BenchmarkTimer`**: Medição de tempo de alta precisão
+- **Métricas**: CPU, memória, tempo de execução
 
-=== Executando benchmark AES-128 ===
-Testando AES com 1024 bytes...
-Testando AES com 10240 bytes...
-...
+#### Camada de Benchmark (`performance/`)
+- **`benchmark.py`**: Orquestração completa dos testes
+- **`BenchmarkSuite`**: Coordenação entre algoritmos e monitoramento
+- **Controle estatístico**: Médias, desvios padrão, intervalos de confiança
+- **Configuração experimental**: Tamanhos de dados, iterações, algoritmos
 
-Algoritmo: AES-128
-----------------------------------------
-Tamanho: 1KB
-Tempo médio criptografia: 0.0002s
-Tempo médio descriptografia: 0.0001s
-Uso médio CPU: 15.2%
-Uso médio memória: 45.8MB
+#### Camada de Análise (`analyze_results.py`)
+- **Processamento de dados**: Carregamento e validação de resultados
+- **Geração de relatórios**: Tabelas e gráficos comparativos
+- **Visualização**: Gráficos matplotlib para análise visual
+- **Formatação**: Arquivos TXT e PNG para diferentes usos
 
-Tamanho: 10KB
-Tempo médio criptografia: 0.0008s
-...
-```
+## Protocolo de Testes
 
-## Módulos
+### Configuração Experimental
+- **Tamanhos de dados**: 1KB, 10KB, 100KB, 1MB
+- **Iterações por teste**: 5 execuções
+- **Geração de dados**: Pseudo-aleatória (os.urandom)
+- **Chaves de teste**: Geradas aleatoriamente por algoritmo
+- **Ambiente controlado**: Sistema isolado durante testes
 
-### algorithms/
-- **`aes.py`**: Implementação completa do AES com interface simples
-- **`blowfish.py`**: Implementação completa do Blowfish
+### Métricas Coletadas
 
-### performance/
-- **`monitor.py`**: Monitora uso de CPU, memória e tempo de execução
-- **`benchmark.py`**: Coordena execução dos testes e coleta métricas
+#### Temporais
+- **Tempo de criptografia**: Duração da operação de cifração
+- **Tempo de descriptografia**: Duração da operação de decifração
+- **Latência total**: Soma criptografia + descriptografia
+- **Throughput**: Dados processados por unidade de tempo
 
-## API dos Algoritmos
+#### Recursos de Sistema
+- **Uso de CPU**: Percentual médio, máximo e mínimo
+- **Consumo de memória**: Pico e média durante execução
+- **Overhead de sistema**: Impacto no sistema operacional
 
-### Uso Básico
+### Controle Estatístico
+- **Média aritmética**: Valor central das métricas
+- **Desvio padrão**: Variabilidade dos resultados
+- **Distribuição**: Análise de normalidade dos dados
+- **Confiabilidade**: Intervalo de confiança dos resultados
 
-```python
-from algorithms.aes import AES
-from algorithms.blowfish import Blowfish
+## O que foi Implementado
 
-# AES
-aes = AES(key_size=256)
-aes.generate_key()
-iv, ciphertext = aes.encrypt(b"dados")
-plaintext = aes.decrypt(iv, ciphertext)
+### Execução Automática (`main.py`)
+- **Benchmark completo**: Executa todos os algoritmos sem intervenção manual
+- **Configuração fixa**: Testa 1KB, 10KB, 100KB, 1MB com 5 iterações cada
+- **Salvamento automático**: Resultados organizados em `results/` com timestamp
 
-# Blowfish
-blowfish = Blowfish(key_size=128)
-blowfish.generate_key()
-iv, ciphertext = blowfish.encrypt(b"dados")
-plaintext = blowfish.decrypt(iv, ciphertext)
-```
+### Sistema de Monitoramento (`performance/monitor.py`)
+- **Threading dedicado**: Monitoramento em background não-bloqueante
+- **Coleta contínua**: Amostras de CPU e memória durante toda a execução
+- **Timer de alta precisão**: Utiliza `time.perf_counter()` para medições exatas
+- **Estatísticas completas**: Calcula média, máximo, mínimo e desvio padrão
 
-### Monitoramento de Desempenho
+### Orquestração de Testes (`performance/benchmark.py`)
+- **Controle experimental rigoroso**: Mesma configuração para todos os algoritmos
+- **Validação de integridade**: Verifica que criptografia ↔ descriptografia funcionam
+- **Gestão inteligente de recursos**: Liberação adequada de memória entre testes
+- **Tratamento robusto de erros**: Sistema continua mesmo com falhas individuais
 
-```python
-from performance.monitor import PerformanceMonitor
+### Análise de Resultados (`analyze_results.py`)
+- **Processamento automático**: Localiza e carrega o último resultado disponível
+- **Geração de múltiplos formatos**: Tabela textual + gráfico visual comparativo
+- **Comparação direta**: Todas as métricas lado a lado para fácil análise
+- **Organização de arquivos**: Tudo salvo de forma estruturada na pasta `results/`
 
-monitor = PerformanceMonitor()
-monitor.start_monitoring()
-# ... execute operações ...
-stats = monitor.stop_monitoring()
-print(f"CPU médio: {stats['cpu']['mean']}%")
-print(f"Memória média: {stats['memory']['mean']}MB")
-```
+## Protocolo Experimental Detalhado
 
-## Requisitos do Sistema
+### Sequência de Execução
+1. **Preparação de Dados**: Geração de conteúdo pseudo-aleatório para cada tamanho
+2. **Configuração de Algoritmo**: Chave aleatória única para cada teste
+3. **Inicialização do Monitor**: Início da coleta de métricas de sistema
+4. **Execução Controlada**: Criptografia seguida de descriptografia com validação
+5. **Análise Estatística**: Cálculo de médias e limpeza de recursos
 
-- Python 3.7+
-- Bibliotecas listadas em `requirements.txt`
+### Controle de Variáveis Independentes
+- **Ambiente consistente**: Mesmo hardware/software para todos os testes
+- **Dados idênticos**: Mesmo conjunto de dados para comparação justa
+- **Execução sequencial**: Um algoritmo por vez para isolamento perfeito
+- **Repetibilidade estatística**: 5 execuções por configuração para confiabilidade
 
-## Notas Técnicas
+### Métricas Técnicas Calculadas
+- **Throughput**: Quantidade de dados processados por unidade de tempo
+- **Latência**: Tempo total gasto por operação completa
+- **Eficiência computacional**: Recursos consumidos por byte processado
+- **Escalabilidade**: Como o desempenho varia com diferentes tamanhos de dados
 
-- Todos os algoritmos usam modo CBC com vetores de inicialização aleatórios
-- Padding PKCS7 é aplicado automaticamente
-- As chaves são geradas aleatoriamente para cada teste
-- O monitoramento de sistema é feito em background durante a execução
-- Os resultados incluem estatísticas completas (média, máximo, mínimo, desvio padrão)
+## Arquivos de Saída
 
-## Extensões Futuras
+### Dados Brutos (`results/benchmark_results_*.json`)
+Estrutura hierárquica completa contendo:
+- Todas as medições individuais coletadas durante os testes
+- Permite análise estatística aprofundada e personalizada
+- Possibilita reprodução de gráficos específicos por métrica
+- Serve como backup completo para validação de resultados
 
-- Suporte a outros modos de operação (ECB, CTR, GCM)
-- Comparação com outros algoritmos (ChaCha20, Twofish)
-- Análise de segurança (tempo para quebra de chave)
-- Testes com hardware dedicado (GPU, TPM)
+### Relatório Consolidado (`results/benchmark_summary.txt`)
+- **Visão tabular comparativa**: Todos os algoritmos lado a lado
+- **Métricas principais destacadas**: Foco no tempo médio de criptografia
+- **Resumo executivo claro**: Comparação final para volumes maiores
+
+### Visualização Gráfica (`results/benchmark_chart.png`)
+- **Gráfico de linhas**: Mostra tendências claras por tamanho de dados
+- **Gráfico de barras**: Comparação direta e visual entre algoritmos
+- **Eixos duplos inteligentes**: Tempo e uso de CPU simultaneamente
+- **Legendas informativas**: Identificação imediata dos algoritmos testados
+
+## Aspectos Técnicos de Segurança
+
+### Vetores de Inicialização (IV)
+- **Geração criptográfica**: Utiliza `os.urandom` para entropia máxima
+- **Unicidade garantida**: Novo IV gerado para cada operação individual
+- **Tamanho apropriado**: 16 bytes para AES, 8 bytes para Blowfish
+
+### Gerenciamento Seguro de Chaves
+- **Geração robusta**: Entropia máxima disponível no sistema operacional
+- **Armazenamento temporário**: Chaves mantidas apenas na memória volátil
+- **Destruição automática**: Limpeza via garbage collector do Python
+
+### Padding Criptográfico
+- **Padrão PKCS#7**: Implementado conforme RFC 5652
+- **Compatibilidade total**: Padrão amplamente adotado na indústria
+- **Segurança verificada**: Resistente a ataques de oracle de padding
