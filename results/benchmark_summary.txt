@@ -2,21 +2,21 @@
 RESUMO DOS RESULTADOS - TEMPO MÉDIO DE CRIPTOGRAFIA (ms)
 ======================================================================
 
-Algoritmo             .0f       .0f       .0f       .1f
+Algoritmo            1 KB     10 KB    100 KB    1.0 MB
 ----------------------------------------------------------------------
-AES-128              6.2f      6.2f      6.2f      6.2f
-AES-192              6.2f      6.2f      6.2f      6.2f
-AES-256              6.2f      6.2f      6.2f      6.2f
-Blowfish-128         6.2f      6.2f      6.2f      6.2f
-Blowfish-256         6.2f      6.2f      6.2f      6.2f
-Blowfish-448         6.2f      6.2f      6.2f      6.2f
+AES-128              1.46      0.10      0.15      1.14
+AES-192              0.06      0.07      0.15      1.31
+AES-256              0.08      0.08      0.17      1.35
+Blowfish-128         0.92      0.15      0.67      6.49
+Blowfish-256         0.10      0.17      0.74      6.53
+Blowfish-448         0.10      0.15      0.70      6.80
 
 ==================================================
 COMPARAÇÃO FINAL (1MB de dados):
 ==================================================
-AES-128           1.80 ms
-AES-192           1.93 ms
-AES-256           1.89 ms
-Blowfish-128      7.56 ms
-Blowfish-256      7.90 ms
-Blowfish-448      7.93 ms
+AES-128           1.14 ms
+AES-192           1.31 ms
+AES-256           1.35 ms
+Blowfish-128      6.49 ms
+Blowfish-256      6.53 ms
+Blowfish-448      6.80 ms
