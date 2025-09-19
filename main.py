@@ -7,7 +7,7 @@ from performance.benchmark import BenchmarkSuite
 
 
 def main():
-    data_sizes = [1024, 10240, 102400, 1048576]
+    data_sizes = [1024, 5120, 10240, 51200, 102400, 512000, 1048576, 5242880]  # 1KB até 5MB
     iterations = 5
 
     suite = BenchmarkSuite()

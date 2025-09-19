@@ -1,3 +1,4 @@
 cryptography
 psutil
 numpy
+chilkat2

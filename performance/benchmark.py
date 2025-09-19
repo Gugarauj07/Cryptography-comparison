@@ -5,6 +5,7 @@ import statistics
 from .monitor import PerformanceMonitor, BenchmarkTimer
 from algorithms.aes import AES
 from algorithms.blowfish import Blowfish
+from algorithms.twofish import Twofish
 
 
 class BenchmarkSuite:
@@ -86,8 +87,8 @@ class BenchmarkSuite:
 
         blowfish_configs = [
             {'name': 'Blowfish-128', 'key_size': 128},
-            {'name': 'Blowfish-256', 'key_size': 256},
-            {'name': 'Blowfish-448', 'key_size': 448}
+            {'name': 'Blowfish-192', 'key_size': 192},
+            {'name': 'Blowfish-256', 'key_size': 256}
         ]
 
         for config in blowfish_configs:
@@ -96,6 +97,23 @@ class BenchmarkSuite:
 
             benchmark_result = self.run_encryption_benchmark(
                 blowfish, data_sizes, iterations
+            )
+            benchmark_result['name'] = config['name']
+            results['algorithms'].append(benchmark_result)
+
+        # Configurações do Twofish
+        twofish_configs = [
+            {'name': 'Twofish-128', 'key_size': 128},
+            {'name': 'Twofish-192', 'key_size': 192},
+            {'name': 'Twofish-256', 'key_size': 256}
+        ]
+
+        for config in twofish_configs:
+            twofish = Twofish(key_size=config['key_size'])
+            twofish.generate_key()
+
+            benchmark_result = self.run_encryption_benchmark(
+                twofish, data_sizes, iterations
             )
             benchmark_result['name'] = config['name']
             results['algorithms'].append(benchmark_result)
